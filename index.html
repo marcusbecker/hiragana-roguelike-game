@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hiragana</title>
+    <style>
+        @media only screen and (min-width: 1025px) {
+            #container {
+                width: 38%;
+                margin: 0 auto;
+            }
+
+            #info {
+                width: 38%;
+                margin: 0 auto;
+            }
+        }
+
+        #container {
+            font-family: "Montserrat", Sans-serif;
+            font-size: 16px;
+        }
+
+        .card {
+            display: inline-block;
+            background-color: white;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px;
+            text-align: center;
+            min-width: 25px;
+        }
+
+        .clicked-state {
+            background-color: #d5d5d7;
+        }
+
+        .sucssesfull-state {
+            background-color: #9bf39b;
+        }
+
+        #lblScore {
+            min-width: 100px;
+            display: inline-block;
+            background-color: antiquewhite;
+            padding: 3px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div class="card">
+            <h3>あ</h3>
+        </div>
+        <div class="card">
+            <h3>い</h3>
+        </div>
+        <hr />
+        <div class="card">
+            <h3>A</h3>
+        </div>
+    </div>
+    <div id="info"><span id="lblScore">Score: 0</span> <button type="button" onclick="resetGame()">Reset game</button>
+    </div>
+
+    <script>
+        const cardsLimit = 5;
+        let score = 0;
+        let leftSel = '';
+        let rightSel = '';
+
+        let start = 0;
+        let limit = 0;
+        let maxScore = 0;
+
+        const all = [
+            { h: 'あ', l: 'a' }, { h: 'い', l: 'i' }, { h: 'う', l: 'u' }, { h: 'え', l: 'e' }, { h: 'お', l: 'o' },
+            { h: 'か', l: 'ka' }, { h: 'き', l: 'ki' }, { h: 'く', l: 'ku' }, { h: 'け', l: 'ke' }, { h: 'こ', l: 'ko' },
+            { h: 'さ', l: 'sa' }, { h: 'し', l: 'shi' }, { h: 'す', l: 'su' }, { h: 'せ', l: 'se' }, { h: 'そ', l: 'so' },
+            { h: 'た', l: 'ta' }, { h: 'ち', l: 'chi' }, { h: 'つ', l: 'tsu' }, { h: 'て', l: 'te' }, { h: 'と', l: 'to' },
+            { h: 'な', l: 'na' }, { h: 'に', l: 'ni' }, { h: 'ぬ', l: 'nu' }, { h: 'ね', l: 'ne' }, { h: 'の', l: 'no' },
+            { h: 'は', l: 'ha' }, { h: 'ひ', l: 'hi' }, { h: 'ふ', l: 'fu' }, { h: 'へ', l: 'he' }, { h: 'ほ', l: 'ho' },
+            { h: 'ま', l: 'ma' }, { h: 'み', l: 'mi' }, { h: 'む', l: 'mu' }, { h: 'め', l: 'me' }, { h: 'も', l: 'mo' },
+            { h: 'や', l: 'ya' }, { h: 'ゆ', l: 'yu' }, { h: 'よ', l: 'yo' },
+            { h: 'ら', l: 'ra' }, { h: 'り', l: 'ri' }, { h: 'る', l: 'ru' }, { h: 'れ', l: 're' }, { h: 'ろ', l: 'ro' },
+            { h: 'ら', l: 'ra' }, { h: 'り', l: 'ri' }, { h: 'る', l: 'ru' }, { h: 'れ', l: 're' }, { h: 'ろ', l: 'ro' },
+            { h: 'わ', l: 'wa' }, { h: 'を', l: 'wo' },
+            { h: 'ん', l: 'n' },
+            { h: 'が', l: 'ga' }, { h: 'ぎ', l: 'gi' }, { h: 'ぐ', l: 'gu' }, { h: 'げ', l: 'ge' }, { h: 'ご', l: 'go' },
+            { h: 'ざ', l: 'za' }, { h: 'じ', l: 'ji' }, { h: 'ず', l: 'zu' }, { h: 'ぜ', l: 'ze' }, { h: 'ぞ', l: 'zo' },
+            { h: 'だ', l: 'da' }, { h: 'ぢ', l: 'ji' }, { h: 'づ', l: 'zu' }, { h: 'で', l: 'de' }, { h: 'ど', l: 'do' },
+            { h: 'ば', l: 'ba' }, { h: 'び', l: 'bi' }, { h: 'ぶ', l: 'bu' }, { h: 'べ', l: 'be' }, { h: 'ぼ', l: 'bo' },
+            { h: 'ぱ', l: 'pa' }, { h: 'ぴ', l: 'pi' }, { h: 'ぷ', l: 'pu' }, { h: 'ぺ', l: 'pe' }, { h: 'ぽ', l: 'po' }
+        ];
+
+        function getValue(str) {
+            return all.find(o => o.h === str || o.l === str);
+        }
+
+        function nextRoud() {
+            start = limit;
+            limit += cardsLimit;
+            limit = limit > all.length ? all.length : limit;
+            const temp = all.slice(start, limit);
+            return temp;
+        }
+
+        function hasNextRoud() {
+            return (start + cardsLimit) < all.length;
+        }
+
+        function resetGame() {
+            leftSel = rightSel = '';
+            score = start = limit = maxScore = 0;
+            setScore(0);
+            createSortedRound();
+        }
+
+        function setScore(score) {
+            document.getElementById('lblScore').innerHTML = `Score: ${score}`;
+        }
+
+        function createRound() {
+            let hiragana = '';
+            let latin = '';
+            nextRoud().forEach(el => {
+                hiragana += `<div class="card chiragana" data-value="${el.l}"><h3>${el.h}</h3></div>`;
+                latin += `<div class="card clatin" data-value="${el.l}"><h3>${el.l}</h3></div>`;
+            });
+
+            document.getElementById('container').innerHTML = hiragana + '<hr />' + latin;
+            getClasses().forEach(card => {
+                for (const el of document.getElementsByClassName(card)) {
+                    el.addEventListener('click', function () {
+                        cardClick(el, card);
+                    });
+                }
+            });
+        }
+
+        function createSortedRound() {
+            let hiragana = [];
+            let latin = [];
+            nextRoud().forEach(el => {
+                hiragana.push(`<div class="card chiragana" data-value="${el.l}"><h3>${el.h}</h3></div>`);
+                latin.push(`<div class="card clatin" data-value="${el.l}"><h3>${el.l}</h3></div>`);
+            });
+
+            shuffleArray(hiragana);
+            shuffleArray(latin);
+
+            document.getElementById('container').innerHTML = hiragana.join('') + '<hr />' + latin.join('');
+            getClasses().forEach(card => {
+                for (const el of document.getElementsByClassName(card)) {
+                    el.addEventListener('click', function () {
+                        cardClick(el, card);
+                    });
+                }
+            });
+        }
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; --i) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+
+            return arr;
+        }
+
+        function getClasses() {
+            return ['chiragana', 'clatin'];
+        }
+
+        function clearClassSelection(className) {
+            for (const el of document.getElementsByClassName(className)) {
+                el.classList.remove('clicked-state');
+            }
+        }
+
+        function clearAllClassSelection() {
+            getClasses().forEach(card => {
+                for (const el of document.getElementsByClassName(card)) {
+                    el.classList.remove('clicked-state');
+                    el.classList.remove('sucssesfull-state');
+                }
+            });
+        }
+
+        function cardClick(el, className) {
+            if (el.classList.contains('sucssesfull-state')) {
+                return;
+            }
+
+            clearClassSelection(className);
+            leftSel = className == 'chiragana' ? el.dataset.value : leftSel;
+            rightSel = className == 'clatin' ? el.dataset.value : rightSel;
+
+            el.classList.add('clicked-state');
+            checkResult();
+        }
+
+        function checkResult() {
+            if (leftSel === '' || rightSel === '') {
+                return;
+            }
+
+            if (leftSel === rightSel) {
+                ++score;
+                maxScore = score > maxScore ? score : maxScore;
+                const temp = [];
+                for (const el of document.getElementsByClassName('clicked-state')) {
+                    temp.push(el);
+                }
+                temp.forEach(el => {
+                    el.classList.add('sucssesfull-state');
+                    el.classList.remove('clicked-state');
+                });
+            } else {
+                score = 0;
+                limit = 0;
+                alert(`Game over. The right answer for ${getValue(leftSel).h} is ${leftSel}. Your max score: ${maxScore}`);
+            }
+
+            leftSel = rightSel = '';
+            setScore(score);
+
+            if (score === limit) {
+                if (hasNextRoud()) {
+                    createSortedRound();
+                } else {
+                    alert('Congratulations, you finished Hiragana Rogue Like game!');
+                }
+            }
+        }
+
+        createSortedRound();
+
+    </script>
+</body>
+
+</html>
