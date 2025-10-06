@@ -64,11 +64,11 @@
             <h3>A</h3>
         </div>
     </div>
-    <div id="info"><span id="lblScore">Score: 0</span> <button type="button" onclick="resetGame()">Reset game</button>
+    <div id="info"><span id="lblScore">Score: 0</span> <button type="button" onclick="game.resetGame()">Reset game</button>
     </div>
 
     <script>
-        console.log('1.0.2');
+        console.log('1.0.3');
 
         class HiraganaWordCard {
             constructor() {
@@ -96,11 +96,11 @@
                 return Array.from(this.all);
             }
 
-            get count(){
+            get count() {
                 return this.all.length;
             }
 
-            limit(start, end){
+            limit(start, end) {
                 return this.all.slice(start, end);
             }
 
@@ -109,155 +109,142 @@
             }
         }
 
+        class GameCard {
+            constructor(words) {
+                this.card = words;
 
-        const card = new HiraganaWordCard();
+                this.cardsLimit = 5;
+                this.score = 0;
+                this.leftSel = '';
+                this.rightSel = '';
 
-        const cardsLimit = 5;
-        let score = 0;
-        let leftSel = '';
-        let rightSel = '';
-
-        let start = 0;
-        let limit = 0;
-        let maxScore = 0;
-
-        function nextRoud() {
-            start = limit;
-            limit += cardsLimit;
-            limit = limit > card.count ? card.count : limit;
-            return card.limit(start, limit);
-        }
-
-        function hasNextRoud() {
-            return (start + cardsLimit) < card.count;
-        }
-
-        function resetGame() {
-            leftSel = rightSel = '';
-            score = start = limit = maxScore = 0;
-            setScore(0);
-            createSortedRound();
-        }
-
-        function setScore(score) {
-            document.getElementById('lblScore').innerHTML = `Score: ${score}`;
-        }
-
-        function createRound() {
-            let hiragana = '';
-            let latin = '';
-            nextRoud().forEach(el => {
-                hiragana += `<div class="card chiragana" data-value="${el.l}"><h3>${el.h}</h3></div>`;
-                latin += `<div class="card clatin" data-value="${el.l}"><h3>${el.l}</h3></div>`;
-            });
-
-            document.getElementById('container').innerHTML = hiragana + '<hr />' + latin;
-            getClasses().forEach(card => {
-                for (const el of document.getElementsByClassName(card)) {
-                    el.addEventListener('click', function () {
-                        cardClick(el, card);
-                    });
-                }
-            });
-        }
-
-        function createSortedRound() {
-            let hiragana = [];
-            let latin = [];
-            nextRoud().forEach(el => {
-                hiragana.push(`<div class="card chiragana" data-value="${el.l}"><h3>${el.h}</h3></div>`);
-                latin.push(`<div class="card clatin" data-value="${el.l}"><h3>${el.l}</h3></div>`);
-            });
-
-            shuffleArray(hiragana);
-            shuffleArray(latin);
-
-            document.getElementById('container').innerHTML = hiragana.join('') + '<hr />' + latin.join('');
-            getClasses().forEach(card => {
-                for (const el of document.getElementsByClassName(card)) {
-                    el.addEventListener('click', function () {
-                        cardClick(el, card);
-                    });
-                }
-            });
-        }
-
-        function shuffleArray(arr) {
-            for (let i = arr.length - 1; i > 0; --i) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
+                this.start = 0;
+                this.limit = 0;
+                this.maxScore = 0;
             }
 
-            return arr;
-        }
-
-        function getClasses() {
-            return ['chiragana', 'clatin'];
-        }
-
-        function clearClassSelection(className) {
-            for (const el of document.getElementsByClassName(className)) {
-                el.classList.remove('clicked-state');
-            }
-        }
-
-        function clearAllClassSelection() {
-            getClasses().forEach(card => {
-                for (const el of document.getElementsByClassName(card)) {
-                    el.classList.remove('clicked-state');
-                    el.classList.remove('sucssesfull-state');
-                }
-            });
-        }
-
-        function cardClick(el, className) {
-            if (el.classList.contains('sucssesfull-state')) {
-                return;
+            nextRoud() {
+                this.start = this.limit;
+                this.limit += this.cardsLimit;
+                this.limit = this.limit > this.card.count ? this.card.count : this.limit;
+                return this.card.limit(this.start, this.limit);
             }
 
-            clearClassSelection(className);
-            leftSel = className == 'chiragana' ? el.dataset.value : leftSel;
-            rightSel = className == 'clatin' ? el.dataset.value : rightSel;
-
-            el.classList.add('clicked-state');
-            checkResult();
-        }
-
-        function checkResult() {
-            if (leftSel === '' || rightSel === '') {
-                return;
+            hasNextRoud() {
+                return (this.start + this.cardsLimit) < this.card.count;
             }
 
-            if (leftSel === rightSel) {
-                ++score;
-                maxScore = score > maxScore ? score : maxScore;
-                const temp = [];
-                for (const el of document.getElementsByClassName('clicked-state')) {
-                    temp.push(el);
-                }
-                temp.forEach(el => {
-                    el.classList.add('sucssesfull-state');
-                    el.classList.remove('clicked-state');
+            resetGame() {
+                this.leftSel = this.rightSel = '';
+                this.score = this.start = this.limit = this.maxScore = 0;
+                this.setScore(0);
+                this.createSortedRound();
+            }
+
+            setScore(score) {
+                document.getElementById('lblScore').innerHTML = `Score: ${score}`;
+            }
+
+            createSortedRound() {
+                let hiragana = [];
+                let latin = [];
+                this.nextRoud().forEach(el => {
+                    hiragana.push(`<div class="card chiragana" data-value="${el.l}"><h3>${el.h}</h3></div>`);
+                    latin.push(`<div class="card clatin" data-value="${el.l}"><h3>${el.l}</h3></div>`);
                 });
-            } else {
-                score = 0;
-                limit = 0;
-                alert(`Game over. The right answer for ${card.getValue(leftSel).h} is ${leftSel}. Your max score: ${maxScore}`);
+
+                this.shuffleArray(hiragana);
+                this.shuffleArray(latin);
+
+                document.getElementById('container').innerHTML = hiragana.join('') + '<hr />' + latin.join('');
+                const ref = this;
+                this.getClasses().forEach(card => {
+                    for (const el of document.getElementsByClassName(card)) {
+                        el.addEventListener('click', function () {
+                            ref.cardClick(el, card);
+                        });
+                    }
+                });
             }
 
-            leftSel = rightSel = '';
-            setScore(score);
+            shuffleArray(arr) {
+                for (let i = arr.length - 1; i > 0; --i) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
 
-            if (score === limit) {
-                if (hasNextRoud()) {
-                    createSortedRound();
+                return arr;
+            }
+
+            getClasses() {
+                return ['chiragana', 'clatin'];
+            }
+
+            clearClassSelection(className) {
+                for (const el of document.getElementsByClassName(className)) {
+                    el.classList.remove('clicked-state');
+                }
+            }
+
+            clearAllClassSelection() {
+                this.getClasses().forEach(card => {
+                    for (const el of document.getElementsByClassName(card)) {
+                        el.classList.remove('clicked-state');
+                        el.classList.remove('sucssesfull-state');
+                    }
+                });
+            }
+
+            cardClick(el, className) {
+                if (el.classList.contains('sucssesfull-state')) {
+                    return;
+                }
+
+                this.clearClassSelection(className);
+                this.leftSel = className === 'chiragana' ? el.dataset.value : this.leftSel;
+                this.rightSel = className === 'clatin' ? el.dataset.value : this.rightSel;
+
+                el.classList.add('clicked-state');
+                this.checkResult();
+            }
+
+            checkResult() {
+                if (this.leftSel === '' || this.rightSel === '') {
+                    return;
+                }
+
+                if (this.leftSel === this.rightSel) {
+                    ++this.score;
+                    this.maxScore = this.score > this.maxScore ? this.score : this.maxScore;
+                    const temp = [];
+                    for (const el of document.getElementsByClassName('clicked-state')) {
+                        temp.push(el);
+                    }
+                    temp.forEach(el => {
+                        el.classList.add('sucssesfull-state');
+                        el.classList.remove('clicked-state');
+                    });
                 } else {
-                    alert('Congratulations, you finished Hiragana Rogue Like game!');
+                    this.score = 0;
+                    this.limit = 0;
+                    alert(`Game over. The right answer for ${this.card.getValue(this.leftSel).h} is ${this.leftSel}. Your max score: ${this.maxScore}`);
+                }
+
+                this.leftSel = this.rightSel = '';
+                this.setScore(this.score);
+
+                if (this.score === this.limit) {
+                    if (this.hasNextRoud()) {
+                        this.createSortedRound();
+                    } else {
+                        alert('Congratulations, you finished Hiragana Rogue Like game!');
+                    }
                 }
             }
         }
 
-        createSortedRound();
+        const game = new GameCard(new HiraganaWordCard());
+        game.createSortedRound();
 
     </script>
 </body>
