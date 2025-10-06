@@ -68,7 +68,49 @@
     </div>
 
     <script>
-        console.log('1.0.1');
+        console.log('1.0.2');
+
+        class HiraganaWordCard {
+            constructor() {
+                this.all = [
+                    { h: 'あ', l: 'a' }, { h: 'い', l: 'i' }, { h: 'う', l: 'u' }, { h: 'え', l: 'e' }, { h: 'お', l: 'o' },
+                    { h: 'か', l: 'ka' }, { h: 'き', l: 'ki' }, { h: 'く', l: 'ku' }, { h: 'け', l: 'ke' }, { h: 'こ', l: 'ko' },
+                    { h: 'さ', l: 'sa' }, { h: 'し', l: 'shi' }, { h: 'す', l: 'su' }, { h: 'せ', l: 'se' }, { h: 'そ', l: 'so' },
+                    { h: 'た', l: 'ta' }, { h: 'ち', l: 'chi' }, { h: 'つ', l: 'tsu' }, { h: 'て', l: 'te' }, { h: 'と', l: 'to' },
+                    { h: 'な', l: 'na' }, { h: 'に', l: 'ni' }, { h: 'ぬ', l: 'nu' }, { h: 'ね', l: 'ne' }, { h: 'の', l: 'no' },
+                    { h: 'は', l: 'ha' }, { h: 'ひ', l: 'hi' }, { h: 'ふ', l: 'fu' }, { h: 'へ', l: 'he' }, { h: 'ほ', l: 'ho' },
+                    { h: 'ま', l: 'ma' }, { h: 'み', l: 'mi' }, { h: 'む', l: 'mu' }, { h: 'め', l: 'me' }, { h: 'も', l: 'mo' },
+                    { h: 'ら', l: 'ra' }, { h: 'り', l: 'ri' }, { h: 'る', l: 'ru' }, { h: 'れ', l: 're' }, { h: 'ろ', l: 'ro' },
+                    { h: 'や', l: 'ya' }, { h: 'ゆ', l: 'yu' }, { h: 'よ', l: 'yo' },
+                    { h: 'わ', l: 'wa' }, { h: 'を', l: 'wo' },
+                    { h: 'が', l: 'ga' }, { h: 'ぎ', l: 'gi' }, { h: 'ぐ', l: 'gu' }, { h: 'げ', l: 'ge' }, { h: 'ご', l: 'go' },
+                    { h: 'ざ', l: 'za' }, { h: 'じ', l: 'ji' }, { h: 'ず', l: 'zu' }, { h: 'ぜ', l: 'ze' }, { h: 'ぞ', l: 'zo' },
+                    { h: 'だ', l: 'da' }, { h: 'ぢ', l: 'ji' }, { h: 'づ', l: 'zu' }, { h: 'で', l: 'de' }, { h: 'ど', l: 'do' },
+                    { h: 'ば', l: 'ba' }, { h: 'び', l: 'bi' }, { h: 'ぶ', l: 'bu' }, { h: 'べ', l: 'be' }, { h: 'ぼ', l: 'bo' },
+                    { h: 'ぱ', l: 'pa' }, { h: 'ぴ', l: 'pi' }, { h: 'ぷ', l: 'pu' }, { h: 'ぺ', l: 'pe' }, { h: 'ぽ', l: 'po' },
+                    { h: 'ん', l: 'n' }
+                ]
+            }
+
+            get words() {
+                return Array.from(this.all);
+            }
+
+            get count(){
+                return this.all.length;
+            }
+
+            limit(start, end){
+                return this.all.slice(start, end);
+            }
+
+            getValue(str) {
+                return this.all.find(o => o.h === str || o.l === str);
+            }
+        }
+
+
+        const card = new HiraganaWordCard();
 
         const cardsLimit = 5;
         let score = 0;
@@ -79,38 +121,15 @@
         let limit = 0;
         let maxScore = 0;
 
-        const all = [
-            { h: 'あ', l: 'a' }, { h: 'い', l: 'i' }, { h: 'う', l: 'u' }, { h: 'え', l: 'e' }, { h: 'お', l: 'o' },
-            { h: 'か', l: 'ka' }, { h: 'き', l: 'ki' }, { h: 'く', l: 'ku' }, { h: 'け', l: 'ke' }, { h: 'こ', l: 'ko' },
-            { h: 'さ', l: 'sa' }, { h: 'し', l: 'shi' }, { h: 'す', l: 'su' }, { h: 'せ', l: 'se' }, { h: 'そ', l: 'so' },
-            { h: 'た', l: 'ta' }, { h: 'ち', l: 'chi' }, { h: 'つ', l: 'tsu' }, { h: 'て', l: 'te' }, { h: 'と', l: 'to' },
-            { h: 'な', l: 'na' }, { h: 'に', l: 'ni' }, { h: 'ぬ', l: 'nu' }, { h: 'ね', l: 'ne' }, { h: 'の', l: 'no' },
-            { h: 'は', l: 'ha' }, { h: 'ひ', l: 'hi' }, { h: 'ふ', l: 'fu' }, { h: 'へ', l: 'he' }, { h: 'ほ', l: 'ho' },
-            { h: 'ま', l: 'ma' }, { h: 'み', l: 'mi' }, { h: 'む', l: 'mu' }, { h: 'め', l: 'me' }, { h: 'も', l: 'mo' },
-            { h: 'ら', l: 'ra' }, { h: 'り', l: 'ri' }, { h: 'る', l: 'ru' }, { h: 'れ', l: 're' }, { h: 'ろ', l: 'ro' },
-            { h: 'や', l: 'ya' }, { h: 'ゆ', l: 'yu' }, { h: 'よ', l: 'yo' },            
-            { h: 'わ', l: 'wa' }, { h: 'を', l: 'wo' },
-            { h: 'が', l: 'ga' }, { h: 'ぎ', l: 'gi' }, { h: 'ぐ', l: 'gu' }, { h: 'げ', l: 'ge' }, { h: 'ご', l: 'go' },
-            { h: 'ざ', l: 'za' }, { h: 'じ', l: 'ji' }, { h: 'ず', l: 'zu' }, { h: 'ぜ', l: 'ze' }, { h: 'ぞ', l: 'zo' },
-            { h: 'だ', l: 'da' }, { h: 'ぢ', l: 'ji' }, { h: 'づ', l: 'zu' }, { h: 'で', l: 'de' }, { h: 'ど', l: 'do' },
-            { h: 'ば', l: 'ba' }, { h: 'び', l: 'bi' }, { h: 'ぶ', l: 'bu' }, { h: 'べ', l: 'be' }, { h: 'ぼ', l: 'bo' },
-            { h: 'ぱ', l: 'pa' }, { h: 'ぴ', l: 'pi' }, { h: 'ぷ', l: 'pu' }, { h: 'ぺ', l: 'pe' }, { h: 'ぽ', l: 'po' },
-            { h: 'ん', l: 'n' }
-        ];
-
-        function getValue(str) {
-            return all.find(o => o.h === str || o.l === str);
-        }
-
         function nextRoud() {
             start = limit;
             limit += cardsLimit;
-            limit = limit > all.length ? all.length : limit;
-            return all.slice(start, limit);
+            limit = limit > card.count ? card.count : limit;
+            return card.limit(start, limit);
         }
 
         function hasNextRoud() {
-            return (start + cardsLimit) < all.length;
+            return (start + cardsLimit) < card.count;
         }
 
         function resetGame() {
@@ -223,7 +242,7 @@
             } else {
                 score = 0;
                 limit = 0;
-                alert(`Game over. The right answer for ${getValue(leftSel).h} is ${leftSel}. Your max score: ${maxScore}`);
+                alert(`Game over. The right answer for ${card.getValue(leftSel).h} is ${leftSel}. Your max score: ${maxScore}`);
             }
 
             leftSel = rightSel = '';
