@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hiragana Group Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 10px;
+    }
+
+    #content {
+      width: 90%;
+      margin: auto;
+    }
+
+    #options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .box {
+      flex: 1 0 30%;
+      margin: 5px;
+      padding: 20px;
+      font-size: 8vw;
+      border: 2px solid #333;
+      cursor: pointer;
+      transition: 0.3s;
+      box-sizing: border-box;
+      border-radius: 10px;
+    }
+
+    .box.correct {
+      background-color: #a0e7a0;
+    }
+
+    .box.wrong {
+      background-color: #e7a0a0;
+    }
+
+    #message {
+      font-size: 5vw;
+      margin-top: 20px;
+    }
+
+    h1 {
+      font-size: 6vw;
+    }
+
+    #question {
+      font-size: 5vw;
+    }
+
+    #question span {
+      color: #F44336;
+    }
+
+    #answers {
+      color: #8b4949;
+      font-size: 4vw;
+    }
+
+    @media (min-width: 768px) {
+      .box {
+        flex: 1 0 8%;
+        font-size: 2vw;
+      }
+
+      #message {
+        font-size: 2vw;
+        margin-top: 20px;
+      }
+
+      h1 {
+        font-size: 3vw;
+      }
+
+      #question {
+        font-size: 2vw;
+      }
+
+      #answers {
+        font-size: 2vw;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Hiragana Group Game</h1>
+  <div id="content">
+    <p id="question"></p>
+    <p id="answers"></p>
+    <div id="options"></div>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    const groups = [
+      { k: [{ h: 'か', l: 'ka' }, { h: 'き', l: 'ki' }, { h: 'く', l: 'ku' }, { h: 'け', l: 'ke' }, { h: 'こ', l: 'ko' }] },
+      { s: [{ h: 'さ', l: 'sa' }, { h: 'し', l: 'shi' }, { h: 'す', l: 'su' }, { h: 'せ', l: 'se' }, { h: 'そ', l: 'so' }] },
+      { t: [{ h: 'た', l: 'ta' }, { h: 'ち', l: 'chi' }, { h: 'つ', l: 'tsu' }, { h: 'て', l: 'te' }, { h: 'と', l: 'to' }] },
+      { n: [{ h: 'な', l: 'na' }, { h: 'に', l: 'ni' }, { h: 'ぬ', l: 'nu' }, { h: 'ね', l: 'ne' }, { h: 'の', l: 'no' }] },
+      { h: [{ h: 'は', l: 'ha' }, { h: 'ひ', l: 'hi' }, { h: 'ふ', l: 'fu' }, { h: 'へ', l: 'he' }, { h: 'ほ', l: 'ho' }] },
+      { m: [{ h: 'ま', l: 'ma' }, { h: 'み', l: 'mi' }, { h: 'む', l: 'mu' }, { h: 'め', l: 'me' }, { h: 'も', l: 'mo' }] },
+      { r: [{ h: 'ら', l: 'ra' }, { h: 'り', l: 'ri' }, { h: 'る', l: 'ru' }, { h: 'れ', l: 're' }, { h: 'ろ', l: 'ro' }] },
+      { y: [{ h: 'や', l: 'ya' }, { h: 'ゆ', l: 'yu' }, { h: 'よ', l: 'yo' }] }
+    ];
+
+    let currentGroup;
+    let selected = [];
+    let start = Math.floor(Math.random() * groups.length);
+
+    function nextLetter() {
+      return start < groups.length - 1 ? ++start : 0;
+    }
+
+    function newRound() {
+      let randomGroupObj = groups[nextLetter()];
+      let key = Object.keys(randomGroupObj)[0];
+      currentGroup = randomGroupObj[key];
+
+      document.getElementById('question').innerHTML =
+        `Selecione todos os símbolos do grupo: <span>${key.toUpperCase()}</span>`;
+
+      let allSymbols = groups.flatMap(g => Object.values(g)[0]);
+      allSymbols.sort(() => Math.random() - 0.5);
+
+      let container = document.getElementById('options');
+      container.innerHTML = '';
+      allSymbols.forEach(sym => {
+        let div = document.createElement('div');
+        div.className = 'box';
+        div.textContent = sym.h;
+        div.onclick = () => checkAnswer(div, sym);
+        container.appendChild(div);
+      });
+
+      selected = [];
+      printAnswer();
+      document.getElementById('message').textContent = '';
+    }
+
+    function printAnswer() {
+      const out = document.getElementById('answers');
+      let temp = '';
+
+      selected.forEach(sel => {
+        if (temp !== '') {
+          temp += ' | ';
+        }
+        temp += `${sel.h} = ${sel.l}`;
+      });
+
+      out.textContent = temp;
+    }
+
+    function checkAnswer(div, sym) {
+      if (currentGroup.includes(sym)) {
+        div.classList.add('correct');
+        selected.push(sym);
+        printAnswer();
+        if (selected.length === currentGroup.length) {
+          //document.getElementById('message').textContent = '✅ Você acertou todos!';
+          //setTimeout(newRound, 1500);
+
+          document.getElementById('message').innerHTML = '✅ Você acertou todos! <a href="#" onclick="newRound(); return false;">Próxima letra</a>';
+        }
+      } else {
+        div.classList.add('wrong');
+        document.getElementById('message').textContent = `❌ ops... ${sym.h} = ${sym.l}!`;
+      }
+    }
+
+    newRound();
+  </script>
+</body>
+
+</html>
